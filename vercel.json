@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/proxy/:path*",
+      "destination": "http://localhost:3001/:path*"
+    }
+  ]
+}
