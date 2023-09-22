@@ -6,6 +6,7 @@
     "noImplicitAny": false,
 
     // path alias
+    "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"]
