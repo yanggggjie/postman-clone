@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { produce } from 'immer'
 
 interface BearStore {
   bears: number
@@ -8,29 +7,23 @@ interface BearStore {
   reset: () => void
 }
 
-export default create<BearStore>((setState) => {
+export default create<BearStore>()((setState, getState) => {
   return {
     bears: 0,
     inc: () => {
-      setState(
-        produce((state: BearStore) => {
-          ++state.bears
-        }),
-      )
+      setState({
+        bears: getState().bears + 1,
+      })
     },
     dec: () => {
-      setState(
-        produce((state: BearStore) => {
-          --state.bears
-        }),
-      )
+      setState({
+        bears: getState().bears - 1,
+      })
     },
     reset: () => {
-      setState(
-        produce((state: BearStore) => {
-          state.bears = 0
-        }),
-      )
+      setState({
+        bears: 0,
+      })
     },
   }
 })
