@@ -5,7 +5,15 @@ export default {
     preflight: true,
   },
   theme: {
-    extend: {},
+    extend: {
+      transitionDuration: {
+        DEFAULT: '500ms',
+      },
+      colors: {
+        main: '#F97315',
+        'main-dark': '#f66600',
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),

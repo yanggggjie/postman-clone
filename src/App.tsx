@@ -1,66 +1,77 @@
 import { clsx } from 'clsx'
 import Title from '@components/Title.js'
 import Buttons from '@components/Buttons.js'
+import Response from '@components/Response/Response.js'
 import Request from '@components/Request/Request.js'
-import Response from '@components/Response.js'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import Test from '@components/Test.js'
-interface Props {}
+import { Dispatch, SetStateAction, useRef, useState } from 'react'
+import axios from 'axios'
+import { entryList2Object } from '@/utils/utils.js'
+import { toast, Toaster } from 'sonner'
+export type IMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
-export interface IStrifyObject {
-  [key: string]: string
+export interface IEntry {
+  id: string
+  key: string
+  value: string
 }
-export type ISetStrifyObject = Dispatch<SetStateAction<IStrifyObject>>
 
-export type IMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+export type IEntryList = IEntry[]
+export type ISetEntryList = Dispatch<SetStateAction<IEntryList>>
 
-function Component({}: Props) {
-  const [url, setUrl] = useState<string>('')
+function Component() {
+  const [url, setUrl] = useState<string>(
+    'https://jsonplaceholder.typicode.com/todos/1',
+  )
   const [method, setMethod] = useState<IMethod>('GET')
-  const [send, setSend] = useState<boolean>(false)
 
-  const [RequestParams, setRequestParams] = useState({
-    name: 'yang',
-  })
-  const [RequestHeaders, setRequestHeaders] = useState({})
-  const [RequestBody, setRequestBody] = useState({})
-
-  const [ResponseHeaders, setResponseHeaders] = useState({})
-  const [ResponseBody, setResponseBody] = useState({})
-
-  useEffect(() => {
-    if (send) {
-      console.log('send')
+  async function handleSendClick() {
+    const axiosConfig = {
+      method: method,
+      url: url,
+      data: entryList2Object(requestBody),
+      params: entryList2Object(requestParams),
+      headers: entryList2Object(requestHeaders),
     }
-    setSend(false)
-  }, [send])
+    try {
+      const res = await axios(axiosConfig)
+      setResponseHeader(JSON.stringify(res.headers, null, 2))
+      setResponseBody(JSON.stringify(res.data, null, 2))
+    } catch (e) {
+      setResponseHeader(JSON.stringify(e.response.headers, null, 2))
+      setResponseBody(JSON.stringify(e.response.data, null, 2))
+    }
+  }
+
+  const [requestParams, setRequestParams] = useState<IEntryList>([])
+  const [requestHeaders, setRequestHeaders] = useState<IEntryList>([])
+  const [requestBody, setRequestBody] = useState<IEntryList>([])
+
+  const [responseBody, setResponseBody] = useState<string>(`{}`)
+  const [responseHeader, setResponseHeader] = useState<string>(`{}`)
 
   return (
-    <div>
+    <div className={clsx('w-screen h-screen overflow-hidden')}>
       <Title></Title>
       <Buttons
         url={url}
-        method={method}
         setUrl={setUrl}
+        method={method}
         setMethod={setMethod}
-        setSend={setSend}
+        handleSendClick={handleSendClick}
       ></Buttons>
       <Request
-        RequestParams={RequestParams}
+        requestParams={requestParams}
         setRequestParams={setRequestParams}
-        RequestHeaders={RequestHeaders}
+        requestHeaders={requestHeaders}
         setRequestHeaders={setRequestHeaders}
-        RequestBody={RequestBody}
+        requestBody={requestBody}
         setRequestBody={setRequestBody}
       ></Request>
       <Response
-        ResponseHeaders={ResponseHeaders}
-        setResponseHeaders={setResponseHeaders}
-        ResponseBody={ResponseBody}
-        setResponseBody={setResponseBody}
+        responseBody={responseBody}
+        responseHeader={responseHeader}
       ></Response>
-      <hr />
-      <Test></Test>
+      <Toaster></Toaster>
     </div>
   )
 }
